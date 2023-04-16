@@ -179,5 +179,5 @@ sol = numpy.linalg.solve(a_array, b_array)
 # Graphs
 plt.plot(x_array, PolyCoefficients(x_array, sol), color='orange')
 plt.ylabel('Distance')
-plt.xlabel('Tempo')
+plt.xlabel('Time')
 plt.savefig("Distance x Time")
