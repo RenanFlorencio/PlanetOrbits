@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-import numpy
+import numpy, math
 
 def PolyCoefficients(x, coeffs):
     # Código obtido da internet em https://stackoverflow.com/questions/37352098/plotting-a-polynomial-using-matplotlib-and-coeffiecients
@@ -85,19 +85,21 @@ def euler_aperf(a1_x0, a1_y0, z1_x0, z1_y0, a2_x0, a2_y0, z2_x0, z2_y0):
 def plota_linha_2(x1, y1, x2, y2, n):
     plt.xlabel('X')
     plt.ylabel('Y')
-    if n == 0:
-        plt.title('Posição dos planetas')
-    else:
-        plt.title('Posição dos planetas ajustada para o centro de massa')
     plt.plot(x1, y1, label='Planeta 1')
     plt.plot(x2, y2, label='Planeta 2')
     plt.xlim(-50, 50)
     plt.ylim(-50, 50)
     plt.legend()
-    plt.show()
+    if n == 0:
+        plt.title("Planets positions")
+        plt.savefig("Planets movement")
+    else:
+        plt.title("Planets positions on the center of mass")
+        plt.savefig("Planets movement on the center of mass")
+    plt.clf()
 
 m1 = 5
-m2 = 8
+m2 = 3
 h = 0.2
 limite = 10 ** 5
 
@@ -107,7 +109,7 @@ p2_x = []
 p2_y = []
 
 # Inicial conditions: (p1_x, p1_y, p2_x, p2_y, p1_vx, p1_vy, p2_vx, p2_vy)
-euler_aperf(2, 4, -5, -4, -1, 0, 1, 0)
+euler_aperf(2, 4, -5, -4, 0, -1, 0, 1)
 plota_linha_2(p1_x, p1_y, p2_x, p2_y, 0)
 
 ''' SETTING THE CENTER OF MASS '''
@@ -133,7 +135,7 @@ for i in range(len(p1_x)):
 
 plota_linha_2(c_p1_x, c_p1_y, c_p2_x, c_p2_y, 1)
 
-sep = 5 # Separação entre os pontos da interpolação
+sep = 5 # Separation between the interpolation pois
 
 ''' DISTANCE INTERPOLATION '''
 tempo = []
@@ -142,9 +144,24 @@ tempo.append(len(p1_x) // 8 * h)
 tempo.append((len(p1_x) - 1) * h)
 
 distancias = []
+
+# Taking samples of the distance
+distancias.append( math.sqrt((p1_x[0] - p2_x[0]) ** 2 + (p1_y[0] - p2_y[0]) ** 2))
+distancias.append( math.sqrt((p1_x[len(p1_x)//8] - p2_x[len(p2_x)//8])**2 + (p1_y[len(p1_y)//8] - p2_y[len(p2_y)//8])**2))
+distancias.append( math.sqrt((p1_x[len(p1_x)-1] - p2_x[len(p2_x)-1])**2 + (p1_y[len(p1_y)-1] - p2_y[len(p2_y)-1])**2))
+
+
+''' INTERPOLATION OF THE DISTANCE '''
+tempo = []
+tempo.append(0)
+tempo.append(len(p1_x)//8 * h)
+tempo.append((len(p1_x)-1) * h)
+
+# Taking samples from the distances
+distancias = []
 distancias.append( (p1_x[0] - p2_x[0])**2 + (p1_y[0] - p2_y[0])**2)
 distancias.append( (p1_x[len(p1_x)//8] - p2_x[len(p2_x)//8])**2 + (p1_y[len(p1_y)//8] - p2_y[len(p2_y)//8])**2)
-distancias.append( (p1_x[len(p1_x)-1] - p2_x[len(p2_x)-1])**2 + (p1_y[len(p1_y)-1] - p2_y[len(p2_y)-1])**2)
+distancias.append( (p1_x[-1] - p2_x[-1])**2 + (p1_y[-1] - p2_y[-1])**2)
 
 # Interpolation
 a = []
@@ -163,4 +180,4 @@ sol = numpy.linalg.solve(a_array, b_array)
 plt.plot(x_array, PolyCoefficients(x_array, sol), color='orange')
 plt.ylabel('Distance')
 plt.xlabel('Tempo')
-plt.show()
+plt.savefig("Distance x Time")
